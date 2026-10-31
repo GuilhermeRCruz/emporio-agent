@@ -10,3 +10,4 @@ build/
 data/processed/*.db
 data/processed/*.npz
 evals/results/
+data/processed/conversations.db
