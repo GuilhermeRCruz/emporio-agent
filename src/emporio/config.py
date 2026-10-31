@@ -10,7 +10,7 @@ RAW_DIR = ROOT / "data" / "raw"
 PROCESSED_DIR = ROOT / "data" / "processed"
 DB_PATH = PROCESSED_DIR / "emporio.db"
 POLICIES_PATH = PROCESSED_DIR / "policies.json"
-EMBEDDINGS_PATH = PROCESSED_DIR / "policy_embeddings.npy"
+EMBEDDINGS_PATH = PROCESSED_DIR / "policy_embeddings.npz"
 
 load_dotenv(ROOT / ".env")
 
