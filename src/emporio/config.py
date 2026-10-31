@@ -1,5 +1,7 @@
 import os
+from datetime import datetime
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 
@@ -16,3 +18,12 @@ OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
 OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
 POLICY_MODE = os.getenv("POLICY_MODE", "sections")
 STORE_TIMEZONE = "America/Campo_Grande"
+
+
+def now() -> datetime:
+    """Store-local time. EMPORIO_NOW (ISO format) pins it for tests and evals."""
+    tz = ZoneInfo(STORE_TIMEZONE)
+    pinned = os.getenv("EMPORIO_NOW")
+    if pinned:
+        return datetime.fromisoformat(pinned).replace(tzinfo=tz)
+    return datetime.now(tz)
