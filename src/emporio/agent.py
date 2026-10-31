@@ -16,6 +16,7 @@ HISTORY_TURNS = 10  # user+assistant pairs sent back to the model
 class ToolCall:
     name: str
     arguments: str
+    output: str
     seconds: float
 
 
@@ -82,7 +83,9 @@ class Agent:
             for call in message.tool_calls:
                 t0 = time.perf_counter()
                 output = tools.run(self.handlers, call.function.name, call.function.arguments)
-                reply.tool_calls.append(ToolCall(call.function.name, call.function.arguments, time.perf_counter() - t0))
+                reply.tool_calls.append(
+                    ToolCall(call.function.name, call.function.arguments, output, time.perf_counter() - t0)
+                )
                 messages.append({"role": "tool", "tool_call_id": call.id, "content": output})
         else:
             reply.text = "Desculpe, me enrolei aqui. Pode repetir a pergunta de outro jeito?"
