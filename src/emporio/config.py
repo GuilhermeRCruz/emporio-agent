@@ -14,8 +14,8 @@ EMBEDDINGS_PATH = PROCESSED_DIR / "policy_embeddings.npz"
 
 load_dotenv(ROOT / ".env")
 
-OPENAI_MODEL = os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-OPENAI_EMBEDDING_MODEL = os.getenv("OPENAI_EMBEDDING_MODEL", "text-embedding-3-small")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
 POLICY_MODE = os.getenv("POLICY_MODE", "sections")
 STORE_TIMEZONE = "America/Campo_Grande"
 

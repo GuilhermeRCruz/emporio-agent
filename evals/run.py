@@ -23,15 +23,15 @@ from pathlib import Path
 
 os.environ.setdefault("EMPORIO_NOW", "2026-10-31T10:00:00")
 
-from openai import OpenAI  # noqa: E402
+from google.genai import types  # noqa: E402
 
-from emporio import config, policies  # noqa: E402
+from emporio import config, llm, policies  # noqa: E402
 from emporio.agent import Agent  # noqa: E402
 from emporio.text import normalize  # noqa: E402
 
 EVALS_DIR = Path(__file__).parent
 POLICY_TOOLS = {"get_store_policy", "search_store_policy"}
-JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "gpt-4.1")
+JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "gemini-2.5-flash")
 
 JUDGE_PROMPT = """\
 You grade a customer service assistant of a Brazilian musical instrument store.
@@ -40,18 +40,18 @@ Be strict about the facts in the rubric and lenient about wording and tone.
 Answer only with JSON: {"pass": true|false, "reason": "<one sentence>"}"""
 
 
-def judge(client: OpenAI, turns: list[str], answers: list[str], rubric: str) -> tuple[bool, str]:
+def judge(turns: list[str], answers: list[str], rubric: str) -> tuple[bool, str]:
     transcript = "\n".join(f"Customer: {u}\nAssistant: {a}" for u, a in zip(turns, answers))
-    response = client.chat.completions.create(
+    response = llm.client().models.generate_content(
         model=JUDGE_MODEL,
-        temperature=0,
-        response_format={"type": "json_object"},
-        messages=[
-            {"role": "system", "content": JUDGE_PROMPT},
-            {"role": "user", "content": f"Conversation:\n{transcript}\n\nRubric: {rubric}"},
-        ],
+        contents=f"Conversation:\n{transcript}\n\nRubric: {rubric}",
+        config=types.GenerateContentConfig(
+            system_instruction=JUDGE_PROMPT,
+            temperature=0,
+            response_mime_type="application/json",
+        ),
     )
-    verdict = json.loads(response.choices[0].message.content)
+    verdict = json.loads(response.text)
     return bool(verdict.get("pass")), verdict.get("reason", "")
 
 
@@ -72,8 +72,8 @@ def policy_hit(calls, expected_key: str) -> bool:
     return False
 
 
-def run_case(client: OpenAI, mode: str, case: dict) -> dict:
-    agent = Agent(policy_mode=mode, client=client)
+def run_case(mode: str, case: dict) -> dict:
+    agent = Agent(policy_mode=mode)
     replies = [agent.ask(turn) for turn in case["turns"]]
     final = replies[-1]
     calls = [c for r in replies for c in r.tool_calls]
@@ -104,7 +104,7 @@ def run_case(client: OpenAI, mode: str, case: dict) -> dict:
 
     judge_reason = None
     if case.get("judge"):
-        ok, judge_reason = judge(client, case["turns"], [r.text for r in replies], case["judge"])
+        ok, judge_reason = judge(case["turns"], [r.text for r in replies], case["judge"])
         if not ok:
             failures.append(f"judge: {judge_reason}")
 
@@ -144,7 +144,7 @@ def summarize(mode: str, results: list[dict]) -> dict:
 
 def report(summaries: list[dict], all_results: dict[str, list[dict]]) -> str:
     lines = [
-        f"# Eval report\n\nModel `{config.OPENAI_MODEL}`, judge `{JUDGE_MODEL}`, "
+        f"# Eval report\n\nModel `{config.GEMINI_MODEL}`, judge `{JUDGE_MODEL}`, "
         f"clock pinned to {os.environ['EMPORIO_NOW']}, run on {datetime.now():%Y-%m-%d %H:%M}.\n",
         "| Policy mode | Cases passed | Policy cases passed | Right section retrieved | Mean latency | p95 latency | "
         "Mean latency on policy cases | Mean input tokens | Cached input |",
@@ -170,7 +170,6 @@ def main() -> None:
     args = parser.parse_args()
 
     cases = [c for c in json.loads((EVALS_DIR / "cases.json").read_text()) if c["id"].startswith(args.only)]
-    client = OpenAI()
     out_dir = EVALS_DIR / "results"
     out_dir.mkdir(exist_ok=True)
 
@@ -178,7 +177,7 @@ def main() -> None:
     for mode in args.modes:
         results = []
         for case in cases:
-            result = run_case(client, mode, case)
+            result = run_case(mode, case)
             results.append(result)
             mark = "PASS" if result["passed"] else "FAIL"
             print(f"[{mode}] {mark} {case['id']} ({result['seconds']:.1f}s) {'; '.join(result['failures'])}", flush=True)

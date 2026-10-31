@@ -2,7 +2,7 @@
 
 sections  The model picks a section key from a closed list; Python returns that section.
           No retrieval step that can miss, no extra network call.
-rag       The question is embedded and the closest subsection chunks are returned.
+rag       The question is embedded (Gemini embeddings) and the closest subsection chunks are returned.
 
 POLICY_MODE selects which one the agent gets. The evals run both.
 """
@@ -11,10 +11,13 @@ import json
 from functools import lru_cache
 
 import numpy as np
+from google.genai import types
 
-from emporio.config import EMBEDDINGS_PATH, OPENAI_EMBEDDING_MODEL, POLICIES_PATH
+from emporio import llm
+from emporio.config import EMBEDDINGS_PATH, GEMINI_EMBEDDING_MODEL, POLICIES_PATH
 
 RAG_TOP_K = 3
+EMBEDDING_DIMENSIONS = 768
 
 
 @lru_cache(maxsize=1)
@@ -37,30 +40,35 @@ def _chunk_text(chunk: dict) -> str:
     return f"{chunk['title']}\n{chunk['text']}"
 
 
-def _embed(client, texts: list[str]) -> np.ndarray:
-    response = client.embeddings.create(model=OPENAI_EMBEDDING_MODEL, input=texts)
-    vectors = np.array([d.embedding for d in response.data], dtype=np.float32)
+def _embed(texts: list[str], task_type: str) -> np.ndarray:
+    response = llm.client().models.embed_content(
+        model=GEMINI_EMBEDDING_MODEL,
+        contents=texts,
+        config=types.EmbedContentConfig(task_type=task_type, output_dimensionality=EMBEDDING_DIMENSIONS),
+    )
+    vectors = np.array([e.values for e in response.embeddings], dtype=np.float32)
+    # truncated Gemini embeddings are not unit length; normalise so dot product = cosine
     return vectors / np.linalg.norm(vectors, axis=1, keepdims=True)
 
 
 @lru_cache(maxsize=1)
-def _chunk_index(client) -> np.ndarray:
+def _chunk_index() -> np.ndarray:
     """Chunk embeddings, cached on disk and rebuilt if the chunks or the model change."""
     chunks = load()["chunks"]
-    signature = OPENAI_EMBEDDING_MODEL + "|" + "|".join(_chunk_text(c) for c in chunks)
+    signature = f"{GEMINI_EMBEDDING_MODEL}|{EMBEDDING_DIMENSIONS}|" + "|".join(_chunk_text(c) for c in chunks)
     if EMBEDDINGS_PATH.exists():
         cached = np.load(EMBEDDINGS_PATH)
         if str(cached["signature"]) == signature:
             return cached["vectors"]
-    vectors = _embed(client, [_chunk_text(c) for c in chunks])
+    vectors = _embed([_chunk_text(c) for c in chunks], "RETRIEVAL_DOCUMENT")
     np.savez(EMBEDDINGS_PATH, vectors=vectors, signature=np.array(signature))
     return vectors
 
 
-def search(client, question: str, top_k: int = RAG_TOP_K) -> dict:
+def search(question: str, top_k: int = RAG_TOP_K) -> dict:
     chunks = load()["chunks"]
-    index = _chunk_index(client)
-    query = _embed(client, [question])[0]
+    index = _chunk_index()
+    query = _embed([question], "RETRIEVAL_QUERY")[0]
     scores = index @ query
     best = np.argsort(-scores)[:top_k]
     return {

@@ -1,33 +1,25 @@
-"""OpenAI tool definitions and dispatch. Strict schemas: every argument is declared, nullable when optional."""
+"""Tool definitions (plain JSON Schema, handed to Gemini as function declarations) and dispatch."""
 
-import json
 from typing import Callable
 
 from emporio import policies, store
 
 
-def _fn(name: str, description: str, properties: dict) -> dict:
+def _fn(name: str, description: str, properties: dict, required: list[str] | None = None) -> dict:
+    """Arguments not listed in `required` are optional: the model simply leaves them out."""
     return {
-        "type": "function",
-        "function": {
-            "name": name,
-            "description": description,
-            "strict": True,
-            "parameters": {
-                "type": "object",
-                "properties": properties,
-                "required": list(properties),
-                "additionalProperties": False,
-            },
+        "name": name,
+        "description": description,
+        "parameters": {
+            "type": "object",
+            "properties": properties,
+            "required": required if required is not None else list(properties),
         },
     }
 
 
-def _nullable(type_: str, description: str, **extra) -> dict:
-    schema = {"type": [type_, "null"], "description": description, **extra}
-    if "enum" in extra:
-        schema["enum"] = [*extra["enum"], None]
-    return schema
+def _optional(type_: str, description: str, **extra) -> dict:
+    return {"type": type_, "description": description, **extra}
 
 
 def store_tools() -> list[dict]:
@@ -37,26 +29,28 @@ def store_tools() -> list[dict]:
             "Busca instrumentos no catálogo com preço, promoção e disponibilidade atuais. "
             "Use para perguntas sobre opções, faixas de preço, tipos de instrumento ou marcas.",
             {
-                "query": _nullable("string", "Texto livre: marca, modelo ou característica. Null para listar por filtros."),
-                "category": _nullable("string", "Categoria do catálogo.", enum=store.category_names()),
-                "min_price": _nullable("number", "Preço mínimo em reais."),
-                "max_price": _nullable("number", "Preço máximo em reais."),
-                "string_type": _nullable("string", "Tipo de corda, para violões e ukuleles.", enum=["nylon", "aco"]),
-                "electric": _nullable("boolean", "true para elétrico/eletroacústico, false para acústico puro."),
+                "query": _optional("string", "Texto livre: marca, modelo ou característica. Omita para listar só por filtros."),
+                "category": _optional("string", "Categoria do catálogo.", enum=store.category_names()),
+                "min_price": _optional("number", "Preço mínimo em reais."),
+                "max_price": _optional("number", "Preço máximo em reais."),
+                "string_type": _optional("string", "Tipo de corda, para violões e ukuleles.", enum=["nylon", "aco"]),
+                "electric": _optional("boolean", "true para elétrico/eletroacústico, false para acústico puro."),
                 "include_unavailable": {
                     "type": "boolean",
                     "description": "true só se o cliente perguntar por itens esgotados ou descontinuados.",
                 },
             },
+            required=[],
         ),
         _fn(
             "get_product",
             "Detalhes de um produto: preço, promoção, estoque, especificações e alternativas se estiver indisponível. "
             "Use quando o cliente cita um modelo específico.",
             {
-                "product_id": _nullable("integer", "ID do produto, se já conhecido."),
-                "name": _nullable("string", "Nome ou modelo como o cliente escreveu."),
+                "product_id": _optional("integer", "ID do produto, se já conhecido."),
+                "name": _optional("string", "Nome ou modelo como o cliente escreveu."),
             },
+            required=[],
         ),
         _fn(
             "lookup_order",
@@ -85,9 +79,10 @@ def store_tools() -> list[dict]:
             "simulate_payment",
             "Calcula PIX, débito, boleto e o parcelamento permitido para um valor ou produto.",
             {
-                "amount": _nullable("number", "Valor da compra em reais."),
-                "product_id": _nullable("integer", "ID do produto; usa o preço atual com promoção."),
+                "amount": _optional("number", "Valor da compra em reais."),
+                "product_id": _optional("integer", "ID do produto; usa o preço atual com promoção."),
             },
+            required=[],
         ),
     ]
 
@@ -110,7 +105,7 @@ def policy_tool(mode: str) -> dict:
     raise ValueError(f"Unknown POLICY_MODE: {mode}")
 
 
-def dispatcher(mode: str, client) -> dict[str, Callable]:
+def dispatcher(mode: str) -> dict[str, Callable]:
     handlers = {
         "search_products": store.search_products,
         "get_product": store.get_product,
@@ -121,14 +116,16 @@ def dispatcher(mode: str, client) -> dict[str, Callable]:
     if mode == "sections":
         handlers["get_store_policy"] = policies.get_section
     else:
-        handlers["search_store_policy"] = lambda question: policies.search(client, question)
+        handlers["search_store_policy"] = policies.search
     return handlers
 
 
-def run(handlers: dict[str, Callable], name: str, arguments: str) -> str:
+def run(handlers: dict[str, Callable], name: str, args: dict) -> dict:
     try:
-        args = {k: v for k, v in json.loads(arguments or "{}").items() if v is not None}
-        result = handlers[name](**args)
+        args = {k: v for k, v in (args or {}).items() if v is not None}
+        for key in ("product_id", "order_id"):  # Gemini sends integers as floats
+            if key in args:
+                args[key] = int(args[key])
+        return handlers[name](**args)
     except Exception as exc:  # the model gets the error and can recover or apologise
-        result = {"erro": f"Falha ao executar {name}: {exc}"}
-    return json.dumps(result, ensure_ascii=False)
+        return {"erro": f"Falha ao executar {name}: {exc}"}

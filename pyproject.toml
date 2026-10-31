@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Customer service agent prototype for Empório da Música"
 requires-python = ">=3.11"
 dependencies = [
-    "openai>=1.60",
+    "google-genai>=1.50",
     "numpy>=1.26",
     "pypdf>=5.0",
     "rapidfuzz>=3.0",

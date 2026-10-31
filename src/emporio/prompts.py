@@ -1,5 +1,5 @@
-"""Persona and rules. The static prompt never changes between calls so OpenAI can cache it;
-the clock goes in a separate, short message."""
+"""Persona and rules. The static prompt never changes between calls so Gemini can cache it;
+the clock rides with each user message."""
 
 from datetime import date, datetime
 

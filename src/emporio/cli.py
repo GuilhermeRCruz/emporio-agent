@@ -18,7 +18,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Chat with the Empório da Música agent")
     parser.add_argument("--session", help="conversation id to save and resume")
     parser.add_argument("--mode", choices=["sections", "rag"], default=config.POLICY_MODE)
-    parser.add_argument("--model", default=config.OPENAI_MODEL)
+    parser.add_argument("--model", default=config.GEMINI_MODEL)
     parser.add_argument("--trace", action="store_true", help="print tool calls, latency and tokens")
     args = parser.parse_args()
 
