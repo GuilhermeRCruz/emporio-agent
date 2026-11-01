@@ -52,9 +52,13 @@ python evals/run.py             # end-to-end eval on both policy modes (about 10
 python conversations/record.py  # re-records the example conversations
 ```
 
-> **About the free tier.** A free key is enough to chat, but in November 2026 the free tier allows
-> only 20 requests per day per model, and a full eval run needs about 100. The evals in this
-> repository were run on a key with billing enabled (a full run costs a few US cents).
+> **Evaluation key.** A temporary key, from an isolated project with a hard monthly spend cap, was
+> sent privately with the submission, so reviewers can test without creating an account. It is
+> never stored in this repository.
+>
+> **About the free tier.** A personal free key is enough to chat, but in November 2026 the free
+> tier allows only 20 requests per day per model, and a full eval run needs about 100. The evals
+> in this repository were run on a key with billing enabled (a full run costs under one US dollar).
 
 ## Architecture
 
