@@ -5,7 +5,7 @@ from functools import lru_cache
 from google import genai
 from google.genai import types
 
-from emporio import config  # noqa: F401  loads .env before the client reads GEMINI_API_KEY
+from emporio import config  # also loads .env before the client reads GEMINI_API_KEY
 
 # Free-tier keys hit 429 quickly during evals; back off instead of failing the run.
 RETRY = types.HttpRetryOptions(attempts=6, initial_delay=2.0, max_delay=60.0, http_status_codes=[429, 500, 503])
@@ -22,5 +22,5 @@ def thinking(model: str) -> types.ThinkingConfig | None:
     if model.startswith("gemini-2.5-flash"):
         return types.ThinkingConfig(thinking_budget=0)
     if model.startswith("gemini-3"):
-        return types.ThinkingConfig(thinking_level="low")
+        return types.ThinkingConfig(thinking_level=config.GEMINI_THINKING_LEVEL)
     return None

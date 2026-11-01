@@ -72,8 +72,8 @@ def policy_hit(calls, expected_key: str) -> bool:
     return False
 
 
-def run_case(mode: str, case: dict) -> dict:
-    agent = Agent(policy_mode=mode)
+def run_case(mode: str, case: dict, model: str) -> dict:
+    agent = Agent(policy_mode=mode, model=model)
     replies = [agent.ask(turn) for turn in case["turns"]]
     final = replies[-1]
     calls = [c for r in replies for c in r.tool_calls]
@@ -142,9 +142,9 @@ def summarize(mode: str, results: list[dict]) -> dict:
     }
 
 
-def report(summaries: list[dict], all_results: dict[str, list[dict]]) -> str:
+def report(summaries: list[dict], all_results: dict[str, list[dict]], model: str) -> str:
     lines = [
-        f"# Eval report\n\nModel `{config.GEMINI_MODEL}`, judge `{JUDGE_MODEL}`, "
+        f"# Eval report\n\nModel `{model}`, judge `{JUDGE_MODEL}`, "
         f"clock pinned to {os.environ['EMPORIO_NOW']}, run on {datetime.now():%Y-%m-%d %H:%M}.\n",
         "| Policy mode | Cases passed | Policy cases passed | Right section retrieved | Mean latency | p95 latency | "
         "Mean latency on policy cases | Mean input tokens | Cached input |",
@@ -166,7 +166,8 @@ def report(summaries: list[dict], all_results: dict[str, list[dict]]) -> str:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--modes", nargs="+", default=["sections", "rag"])
-    parser.add_argument("--only", default="", help="run only cases whose id starts with this")
+    parser.add_argument("--only", nargs="+", default=[""], help="run only cases whose id starts with one of these")
+    parser.add_argument("--model", default=config.GEMINI_MODEL)
     parser.add_argument(
         "--all-cases-in-rag",
         action="store_true",
@@ -174,7 +175,7 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    cases = [c for c in json.loads((EVALS_DIR / "cases.json").read_text()) if c["id"].startswith(args.only)]
+    cases = [c for c in json.loads((EVALS_DIR / "cases.json").read_text()) if c["id"].startswith(tuple(args.only))]
     out_dir = EVALS_DIR / "results"
     out_dir.mkdir(exist_ok=True)
 
@@ -184,7 +185,7 @@ def main() -> None:
         mode_cases = cases if mode == "sections" or args.all_cases_in_rag else [c for c in cases if c["group"] == "policy"]
         for case in mode_cases:
             try:
-                result = run_case(mode, case)
+                result = run_case(mode, case, args.model)
             except Exception as exc:  # one API failure should not throw away the whole run
                 if "PerDay" in str(exc):
                     sys.exit(f"Daily API quota exhausted at case {case['id']}: {str(exc)[:200]}")
@@ -198,7 +199,7 @@ def main() -> None:
         summaries.append(summarize(mode, results))
         (out_dir / f"{mode}.json").write_text(json.dumps(results, ensure_ascii=False, indent=2))
 
-    text = report(summaries, all_results)
+    text = report(summaries, all_results, args.model)
     (out_dir / "report.md").write_text(text)
     print("\n" + text)
     sys.exit(0 if all(s["passed"] == s["total"] for s in summaries) else 1)

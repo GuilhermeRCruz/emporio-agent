@@ -14,8 +14,10 @@ EMBEDDINGS_PATH = PROCESSED_DIR / "policy_embeddings.npz"
 
 load_dotenv(ROOT / ".env")
 
-GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-2.5-flash")
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash")
 GEMINI_EMBEDDING_MODEL = os.getenv("GEMINI_EMBEDDING_MODEL", "gemini-embedding-001")
+# Gemini 3 models only: minimal | low | medium | high (3.8 Flash has no minimal)
+GEMINI_THINKING_LEVEL = os.getenv("GEMINI_THINKING_LEVEL", "minimal")
 POLICY_MODE = os.getenv("POLICY_MODE", "sections")
 STORE_TIMEZONE = "America/Campo_Grande"
 
