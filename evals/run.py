@@ -35,16 +35,22 @@ JUDGE_MODEL = os.getenv("EVAL_JUDGE_MODEL", "gemini-2.5-flash")
 
 JUDGE_PROMPT = """\
 You grade a customer service assistant of a Brazilian musical instrument store.
-Read the conversation and decide if the assistant's LAST reply satisfies the rubric.
+Read the conversation and decide if the assistant's final reply, the whole text inside
+<final_reply>, satisfies the rubric. Replies can have several paragraphs; consider all of them.
 Be strict about the facts in the rubric and lenient about wording and tone.
 Answer only with JSON: {"pass": true|false, "reason": "<one sentence>"}"""
 
 
 def judge(turns: list[str], answers: list[str], rubric: str) -> tuple[bool, str]:
-    transcript = "\n".join(f"Customer: {u}\nAssistant: {a}" for u, a in zip(turns, answers))
+    # Explicit tags: with plain "Assistant:" prefixes the judge read the last paragraph
+    # of a multi-paragraph answer as the whole reply and failed correct answers.
+    earlier = "\n".join(
+        f"<customer>{u}</customer>\n<assistant>{a}</assistant>" for u, a in zip(turns[:-1], answers[:-1])
+    )
+    transcript = f"{earlier}\n<customer>{turns[-1]}</customer>\n<final_reply>{answers[-1]}</final_reply>"
     response = llm.client().models.generate_content(
         model=JUDGE_MODEL,
-        contents=f"Conversation:\n{transcript}\n\nRubric: {rubric}",
+        contents=f"<conversation>\n{transcript.strip()}\n</conversation>\n\n<rubric>{rubric}</rubric>",
         config=types.GenerateContentConfig(
             system_instruction=JUDGE_PROMPT,
             temperature=0,
