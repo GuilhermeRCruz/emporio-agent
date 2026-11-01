@@ -167,6 +167,11 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--modes", nargs="+", default=["sections", "rag"])
     parser.add_argument("--only", default="", help="run only cases whose id starts with this")
+    parser.add_argument(
+        "--all-cases-in-rag",
+        action="store_true",
+        help="by default rag runs only the policy cases: the other cases never touch the policy tool",
+    )
     args = parser.parse_args()
 
     cases = [c for c in json.loads((EVALS_DIR / "cases.json").read_text()) if c["id"].startswith(args.only)]
@@ -176,8 +181,16 @@ def main() -> None:
     summaries, all_results = [], {}
     for mode in args.modes:
         results = []
-        for case in cases:
-            result = run_case(mode, case)
+        mode_cases = cases if mode == "sections" or args.all_cases_in_rag else [c for c in cases if c["group"] == "policy"]
+        for case in mode_cases:
+            try:
+                result = run_case(mode, case)
+            except Exception as exc:  # one API failure should not throw away the whole run
+                if "PerDay" in str(exc):
+                    sys.exit(f"Daily API quota exhausted at case {case['id']}: {str(exc)[:200]}")
+                result = {"id": case["id"], "group": case["group"], "passed": False, "seconds": 0.0,
+                          "failures": [f"error: {str(exc)[:200]}"], "retrieval_ok": None, "answer": "",
+                          "tool_calls": [], "llm_calls": 0, "input_tokens": 0, "cached_tokens": 0, "output_tokens": 0}
             results.append(result)
             mark = "PASS" if result["passed"] else "FAIL"
             print(f"[{mode}] {mark} {case['id']} ({result['seconds']:.1f}s) {'; '.join(result['failures'])}", flush=True)
