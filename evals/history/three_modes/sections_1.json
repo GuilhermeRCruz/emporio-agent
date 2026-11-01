@@ -1,0 +1,224 @@
+[
+  {
+    "id": "policy_payment_methods",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Aqui na Empório da Música aceitamos as seguintes formas de pagamento:\n\n• **PIX:** à vista com 5% de desconto (válido para produtos fora de promoção).\n• **Cartão de Débito:** à vista (todas as bandeiras).\n• **Boleto Bancário:** à vista (compensação em até 3 dias úteis).\n• **Cartão de Crédito:** em até 12x sem juros (com parcela mínima a partir de R$ 80,00 para 4x-6x e R$ 100,00 para 7x-12x).\n\nTambém permitimos combinar duas formas de pagamento (como PIX + cartão) para compras acima de R$ 2.000,00. \n\nSe quiser simular as condições para um instrumento específico, é só me avisar! Posso ajudar em algo mais?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"pagamento\"}"
+      }
+    ],
+    "seconds": 21.03182866697898,
+    "llm_calls": 2,
+    "input_tokens": 4998,
+    "cached_tokens": 0,
+    "output_tokens": 215
+  },
+  {
+    "id": "policy_installments_limit",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": null,
+    "answer": "Não dá para parcelar R$ 600 em 10x porque a parcela mínima para parcelamentos de 7x a 12x é de R$ 100,00. \n\nPara esse valor, você consegue parcelar em até 6x de R$ 100,00 sem juros no cartão de crédito. À vista no PIX fica por R$ 570,00 (com 5% de desconto).\n\nPosso te ajudar com mais alguma dúvida?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"pagamento\"}"
+      },
+      {
+        "name": "simulate_payment",
+        "arguments": "{\"amount\": 600}"
+      }
+    ],
+    "seconds": 3.049966749968007,
+    "llm_calls": 3,
+    "input_tokens": 7813,
+    "cached_tokens": 0,
+    "output_tokens": 146
+  },
+  {
+    "id": "policy_defect_window",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para trocas por defeito de fabricação, o prazo é de até 30 dias corridos após a compra. \n\nDepois desse período, o acionamento é feito diretamente com a garantia do fabricante (e a gente pode te ajudar a intermediar se precisar). Lembrando que a garantia não cobre danos por mau uso, quedas ou umidade.\n\nPosso te ajudar com mais alguma dúvida?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"trocas_e_devolucoes\"}"
+      }
+    ],
+    "seconds": 1.9564734160085209,
+    "llm_calls": 2,
+    "input_tokens": 5179,
+    "cached_tokens": 0,
+    "output_tokens": 109
+  },
+  {
+    "id": "policy_free_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para Campo Grande, o frete é grátis em compras acima de R$ 500,00! \n\nPara pedidos abaixo desse valor, a taxa é fixa de R$ 35,00, e a entrega é feita por motoboy próprio em até 3 dias úteis.\n\nQuer ajuda para escolher algum instrumento?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"frete_e_entregas\"}"
+      }
+    ],
+    "seconds": 2.285766415996477,
+    "llm_calls": 2,
+    "input_tokens": 5182,
+    "cached_tokens": 0,
+    "output_tokens": 98
+  },
+  {
+    "id": "policy_split_payment",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Pode sim! A combinação de formas de pagamento (como PIX + cartão) é permitida para compras acima de R$ 2.000,00. \n\nVale lembrar que o desconto de 5% do PIX só é aplicado sobre a parte que for paga nessa modalidade (desde que o produto não esteja em promoção).\n\nPosso te ajudar a escolher algum instrumento ou tirar mais dúvidas sobre as opções de pagamento?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"pagamento\"}"
+      }
+    ],
+    "seconds": 2.427934583975002,
+    "llm_calls": 2,
+    "input_tokens": 5010,
+    "cached_tokens": 0,
+    "output_tokens": 110
+  },
+  {
+    "id": "policy_warranty_strings",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "A garantia não cobre a troca de cordas, pois o rompimento ou desgaste natural das cordas é considerado um desgaste normal do uso.\n\nAlém disso, nós vendemos exclusivamente instrumentos musicais, então não temos cordas avulsas ou acessórios aqui na loja. Sugiro procurar uma loja especializada em acessórios musicais para comprar um jogo novo!\n\nSe precisar de ajuda com algum de nossos instrumentos, estou à disposição!",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"garantia\"}"
+      }
+    ],
+    "seconds": 2.1601719160098583,
+    "llm_calls": 2,
+    "input_tokens": 4959,
+    "cached_tokens": 0,
+    "output_tokens": 104
+  },
+  {
+    "id": "policy_return_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "No caso de devolução por arrependimento em compras online, o frete de devolução é por conta da loja! \n\nVocê tem até 7 dias corridos após o recebimento do produto para fazer a solicitação, desde que o violão esteja sem sinais de uso, na embalagem original e com todos os acessórios e manuais.\n\nSe você quiser dar andamento na devolução de um pedido específico, é só me passar o número do pedido e o e-mail ou telefone cadastrado.\n\nPosso te ajudar com mais alguma dúvida?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"trocas_e_devolucoes\"}"
+      }
+    ],
+    "seconds": 2.3086542079690844,
+    "llm_calls": 2,
+    "input_tokens": 5201,
+    "cached_tokens": 0,
+    "output_tokens": 140
+  },
+  {
+    "id": "policy_privacy",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Não compartilhamos seus dados com terceiros para fins de marketing! \n\nSeus dados (como nome, telefone, e-mail e endereço) são usados exclusivamente para processar e entregar seus pedidos, comunicar o status de entregas, enviar promoções (se você autorizar) e cumprir obrigações fiscais e legais, conforme a LGPD.\n\nVocê também pode solicitar a exclusão dos seus dados a qualquer momento com a gente.\n\nPosso te ajudar com mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"privacidade\"}"
+      }
+    ],
+    "seconds": 2.0975719169946387,
+    "llm_calls": 2,
+    "input_tokens": 4912,
+    "cached_tokens": 0,
+    "output_tokens": 120
+  },
+  {
+    "id": "policy_warranty_followup",
+    "group": "policy",
+    "passed": false,
+    "failures": [
+      "judge: The assistant's reply correctly states the legal warranty and the potential manufacturer's warranty, but it does not explicitly offer the store's help with the manufacturer's warranty claim."
+    ],
+    "retrieval_ok": true,
+    "answer": "A garantia legal é de 90 dias (3 meses) contra defeitos de fabricação. Como seriam 4 meses, ela já teria passado.\n\nPorém, a maioria dos fabricantes oferece garantia contratual própria, que pode variar de 6 meses a até 2 anos. O prazo exato e as condições ficam no certificado de garantia que vem com o instrumento.\n\nVale lembrar que a garantia só cobre se o problema for defeito de fabricação. Danos causados por mau uso ou exposição a condições climáticas extremas (como calor ou umidade excessiva) não são cobertos.\n\nPosso te ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"garantia\"}"
+      },
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"garantia\"}"
+      }
+    ],
+    "seconds": 3.975031584093813,
+    "llm_calls": 4,
+    "input_tokens": 10074,
+    "cached_tokens": 0,
+    "output_tokens": 238
+  },
+  {
+    "id": "policy_shipping_other_city",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para entregas em Dourados, trabalhamos com três modalidades de envio:\n\n• SEDEX (Correios): 2 a 5 dias úteis\n• Jadlog (.package): 3 a 8 dias úteis\n• PAC (Correios): 5 a 12 dias úteis\n\nO valor exato do frete é calculado de acordo com o CEP de destino, peso e tamanho do instrumento. \n\nPosso te ajudar a escolher algum instrumento ou tirar mais dúvidas?",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"frete_e_entregas\"}"
+      }
+    ],
+    "seconds": 3.2142523750080727,
+    "llm_calls": 2,
+    "input_tokens": 5184,
+    "cached_tokens": 0,
+    "output_tokens": 127
+  },
+  {
+    "id": "policy_mouthpiece_exchange",
+    "group": "policy",
+    "passed": false,
+    "failures": [
+      "policy section 'trocas_e_devolucoes' not retrieved",
+      "judge: The reply states that mouthpieces are not exchanged because the store only works with instruments, not for hygiene reasons as required by the rubric."
+    ],
+    "retrieval_ok": false,
+    "answer": "Não realizamos troca nem venda de boquilhas ou acessórios (como palhetas, cabos e capas), pois trabalhamos apenas com instrumentos musicais. \n\nRecomendo procurar uma loja especializada em acessórios musicais para te ajudar com a boquilha do seu sax! \n\nSe precisar de ajuda com algum de nossos instrumentos, fico à disposição.",
+    "tool_calls": [
+      {
+        "name": "get_store_policy",
+        "arguments": "{\"section\": \"sobre_a_loja\"}"
+      }
+    ],
+    "seconds": 2.9449644580017775,
+    "llm_calls": 2,
+    "input_tokens": 5126,
+    "cached_tokens": 0,
+    "output_tokens": 97
+  }
+]

@@ -1,0 +1,221 @@
+[
+  {
+    "id": "policy_payment_methods",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Aqui na Empório da Música a gente aceita:\n\n• **PIX:** à vista, com 5% de desconto (válido para produtos com preço normal de tabela).\n• **Cartão de débito:** à vista.\n• **Boleto bancário:** à vista (compensação em até 3 dias úteis).\n• **Cartão de crédito:** até 12x sem juros (com parcela mínima de R$ 100,00 para opções de 7x a 12x, R$ 80,00 de 4x a 6x, e R$ 50,00 até 3x).\n\nPara compras acima de R$ 2.000,00, você também pode combinar duas formas de pagamento (como PIX + cartão). \n\nPosso te ajudar a escolher algum instrumento hoje?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quais são as formas de pagamento aceitas pela loja e regras de parcelamento?\"}"
+      }
+    ],
+    "seconds": 3.065368082956411,
+    "llm_calls": 2,
+    "input_tokens": 5097,
+    "cached_tokens": 0,
+    "output_tokens": 222
+  },
+  {
+    "id": "policy_installments_limit",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": null,
+    "answer": "Não dá para parcelar em 10x nesse valor. \n\nPara parcelar de 7x a 12x sem juros, a parcela mínima precisa ser de R$ 100,00 (o que daria um valor mínimo de R$ 1.000,00 para 10x). \n\nPara R$ 600,00, você consegue parcelar em até **6x de R$ 100,00 sem juros** no cartão de crédito. À vista no PIX fica por R$ 570,00 (com 5% de desconto).\n\nPosso te ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quais são as regras de parcelamento? Dá para parcelar R$ 600 em 10x?\"}"
+      },
+      {
+        "name": "simulate_payment",
+        "arguments": "{\"amount\": 600}"
+      }
+    ],
+    "seconds": 4.194554165995214,
+    "llm_calls": 3,
+    "input_tokens": 8010,
+    "cached_tokens": 0,
+    "output_tokens": 205
+  },
+  {
+    "id": "policy_defect_window",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "O prazo para solicitar a troca de um instrumento com defeito de fabricação é de até 30 dias corridos após a compra.\n\nSe já tiver passado desse prazo, você pode acionar a garantia do fabricante, e a gente também pode ajudar a intermediar se precisar.\n\nVocê está com algum produto com defeito ou precisa de ajuda com um pedido específico?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Qual o prazo para solicitar troca ou devolução de instrumento com defeito?\"}"
+      }
+    ],
+    "seconds": 2.930103041988332,
+    "llm_calls": 2,
+    "input_tokens": 4937,
+    "cached_tokens": 0,
+    "output_tokens": 107
+  },
+  {
+    "id": "policy_free_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para entregas em Campo Grande, o frete é grátis nas compras acima de R$ 500,00! \n\nSe o valor do pedido for menor que R$ 500,00, a taxa de entrega fica por R$ 35,00. O prazo é de 1 a 3 dias úteis e a entrega é feita pelo nosso motoboy.\n\nPosso te ajudar com mais alguma dúvida ou na escolha de algum instrumento?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"O frete é grátis para entregas em Campo Grande MS?\"}"
+      }
+    ],
+    "seconds": 12.585504499962553,
+    "llm_calls": 2,
+    "input_tokens": 5188,
+    "cached_tokens": 0,
+    "output_tokens": 134
+  },
+  {
+    "id": "policy_split_payment",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Sim! É possível combinar o pagamento entre PIX e cartão, mas essa opção é permitida para compras a partir de R$ 2.000,00. \n\nSe precisar de ajuda para escolher um instrumento ou calcular o pagamento, estou por aqui! Pode ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Posso pagar uma parte no PIX e o resto no cartão?\"}"
+      }
+    ],
+    "seconds": 12.694768790970556,
+    "llm_calls": 2,
+    "input_tokens": 5065,
+    "cached_tokens": 0,
+    "output_tokens": 93
+  },
+  {
+    "id": "policy_warranty_strings",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Poxa, infelizmente a garantia não cobre a troca de cordas arrebentadas, pois elas são consideradas peças de desgaste natural do instrumento. \n\nComo nós vendemos apenas os instrumentos musicais por aqui, sugiro procurar uma loja especializada em acessórios musicais para adquirir um jogo novo de cordas.\n\nPosso te ajudar com mais alguma coisa em relação aos nossos instrumentos?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A garantia cobre cordas de violão quebradas ou arrebentadas?\"}"
+      }
+    ],
+    "seconds": 3.053261917026248,
+    "llm_calls": 2,
+    "input_tokens": 4959,
+    "cached_tokens": 0,
+    "output_tokens": 111
+  },
+  {
+    "id": "policy_return_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Em caso de devolução por arrependimento em compras online, o frete de devolução é por conta da loja! \n\nVocê tem até 7 dias corridos após o recebimento do produto para solicitar a devolução. O violão precisa estar na embalagem original, sem sinais de uso e com todos os acessórios e manuais.\n\nSe você quiser dar andamento na devolução do seu pedido, é só me passar o número do pedido e o e-mail ou telefone cadastrado que eu verifico para você. Posso ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quem paga o frete na devolução por arrependimento?\"}"
+      }
+    ],
+    "seconds": 3.2415653750067577,
+    "llm_calls": 2,
+    "input_tokens": 4972,
+    "cached_tokens": 0,
+    "output_tokens": 146
+  },
+  {
+    "id": "policy_privacy",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Não, de jeito nenhum! A gente segue a LGPD à risca e não compartilha os seus dados com terceiros para fins de marketing. \n\nUsamos suas informações apenas para processar seus pedidos, entregar os produtos e enviar novidades (se você autorizar).\n\nPosso te ajudar com mais alguma dúvida?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Como a loja lida com o compartilhamento de dados pessoais dos clientes com outras empresas?\"}"
+      }
+    ],
+    "seconds": 2.7162581250304356,
+    "llm_calls": 2,
+    "input_tokens": 5075,
+    "cached_tokens": 0,
+    "output_tokens": 101
+  },
+  {
+    "id": "policy_warranty_followup",
+    "group": "policy",
+    "passed": false,
+    "failures": [
+      "judge: The assistant's reply correctly states the 90-day legal warranty no longer applies and mentions a potential manufacturer's warranty, but it fails to state that the store can help with the manufacturer's warranty, instead directing the customer to contact the manufacturer directly."
+    ],
+    "retrieval_ok": true,
+    "answer": "A garantia cobriria se fosse um defeito de fabricação identificado dentro do prazo da garantia (que legalmente é de 90 dias).\n\nComo já se passaram 4 meses (cerca de 120 dias), o prazo da garantia legal contra defeitos de fabricação já expirou. Além disso, a garantia não cobre danos por mau uso ou exposição a condições climáticas extremas e umidade.\n\nSe o violão tiver uma garantia contratual do fabricante com prazo maior que 90 dias, você precisará acionar a assistência técnica do fabricante.\n\nPosso te ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A garantia cobre corda arrebentada ou desgaste natural de cordas?\"}"
+      },
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A garantia cobre o braço do violão se empenar depois de 4 meses de uso?\"}"
+      }
+    ],
+    "seconds": 6.279194041038863,
+    "llm_calls": 4,
+    "input_tokens": 10023,
+    "cached_tokens": 0,
+    "output_tokens": 237
+  },
+  {
+    "id": "policy_shipping_other_city",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para entregas fora de Campo Grande, como em Dourados, enviamos por Correios ou Jadlog. Os prazos estimados são:\n\n• **SEDEX**: 2 a 5 dias úteis\n• **Jadlog**: 3 a 8 dias úteis\n• **PAC**: 5 a 12 dias úteis\n\nO tempo exato e o valor do frete dependem do produto escolhido e do CEP de destino.\n\nPosso te ajudar a escolher algum instrumento ou consultar o frete de algum modelo específico?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Qual é o prazo de entrega para compras com envio em Mato Grosso do Sul ou Dourados?\"}"
+      }
+    ],
+    "seconds": 2.9321082499809563,
+    "llm_calls": 2,
+    "input_tokens": 5164,
+    "cached_tokens": 0,
+    "output_tokens": 151
+  },
+  {
+    "id": "policy_mouthpiece_exchange",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Não fazemos troca de boquilhas por questões de higiene, e também não vendemos acessórios nem fazemos serviços de manutenção. \n\nRecomendo procurar uma loja ou oficina especializada em acessórios e manutenção de instrumentos musicais!\n\nSe precisar de ajuda para escolher um novo instrumento musical aqui da loja, estou à disposição. Pode ajudar em mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A loja vende acessórios ou realiza troca e manutenção de peças como boquilha de instrumento de sopro?\"}"
+      }
+    ],
+    "seconds": 3.293407124991063,
+    "llm_calls": 2,
+    "input_tokens": 5042,
+    "cached_tokens": 0,
+    "output_tokens": 110
+  }
+]

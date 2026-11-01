@@ -2,8 +2,10 @@
 
 sections    The model picks a section key from a closed list; Python returns that section.
             No retrieval step that can miss, no extra network call.
-rag         The question is embedded (Gemini embeddings) and the closest subsection chunks are returned.
-rag_parent  Same search over subsection chunks, but the whole sections they belong to are returned.
+rag_parent  The question is embedded (Gemini embeddings) and matched against subsection chunks;
+            the whole sections those chunks belong to are returned (parent document retrieval).
+            A plain chunk RAG was measured too and removed: same accuracy and latency, but it
+            could cut the context a follow-up needed (evals/history/three_modes).
 
 POLICY_MODE selects which one the agent gets. The evals run all of them.
 """
@@ -71,17 +73,6 @@ def _rank(question: str) -> tuple[list[dict], np.ndarray, np.ndarray]:
     chunks = load()["chunks"]
     scores = _chunk_index() @ _embed([question], "RETRIEVAL_QUERY")[0]
     return chunks, scores, np.argsort(-scores)
-
-
-def search(question: str, top_k: int = RAG_TOP_K) -> dict:
-    chunks, scores, order = _rank(question)
-    best = order[:top_k]
-    return {
-        "trechos": [
-            {"secao": chunks[i]["title"], "texto": chunks[i]["text"], "similaridade": round(float(scores[i]), 3)}
-            for i in best
-        ]
-    }
 
 
 def search_parent(question: str, top_k: int = RAG_TOP_K, max_sections: int = PARENT_MAX_SECTIONS) -> dict:

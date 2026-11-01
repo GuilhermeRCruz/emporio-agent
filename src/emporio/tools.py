@@ -107,13 +107,6 @@ def policy_tool(mode: str) -> dict:
             "frete, promoções, garantia, privacidade e atendimento.",
             {"section": {"type": "string", "enum": policies.section_keys(), "description": "Seção do manual."}},
         )
-    if mode == "rag":
-        return _fn(
-            "search_store_policy",
-            "Busca no manual de políticas da loja os trechos mais relevantes para a pergunta. Use para regras de "
-            "pagamento, trocas e devoluções, frete, promoções, garantia, privacidade e atendimento.",
-            {"question": {"type": "string", "description": "A dúvida do cliente, reescrita de forma completa."}},
-        )
     if mode == "rag_parent":
         return _fn(
             "search_store_policy",
@@ -135,8 +128,6 @@ def dispatcher(mode: str) -> dict[str, Callable]:
     }
     if mode == "sections":
         handlers["get_store_policy"] = policies.get_section
-    elif mode == "rag":
-        handlers["search_store_policy"] = policies.search
     else:
         handlers["search_store_policy"] = policies.search_parent
     return handlers

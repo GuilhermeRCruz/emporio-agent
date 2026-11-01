@@ -1,7 +1,7 @@
 """Runs every case in evals/cases.json against the agent, once per policy mode.
 
     python evals/run.py                    both modes
-    python evals/run.py --modes rag        one mode
+    python evals/run.py --modes rag_parent one mode
     python evals/run.py --only order_      cases whose id starts with a prefix
 
 Each case passes only if every check passes:
@@ -73,7 +73,7 @@ def policy_hit(calls, expected_key: str) -> bool:
         if call.name not in POLICY_TOOLS:
             continue
         out = json.loads(call.output)
-        found = [out.get("secao", "")] + [t["secao"] for t in out.get("trechos", []) + out.get("secoes", [])]
+        found = [out.get("secao", "")] + [s["secao"] for s in out.get("secoes", [])]
         if any(f.startswith(title) for f in found):
             return True
     return False
@@ -172,7 +172,7 @@ def report(summaries: list[dict], all_results: dict[str, list[dict]], model: str
 
 def main() -> None:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--modes", nargs="+", default=["sections", "rag", "rag_parent"])
+    parser.add_argument("--modes", nargs="+", default=["sections", "rag_parent"])
     parser.add_argument("--only", nargs="+", default=[""], help="run only cases whose id starts with one of these")
     parser.add_argument("--model", default=config.GEMINI_MODEL)
     parser.add_argument(

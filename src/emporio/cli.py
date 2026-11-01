@@ -2,7 +2,7 @@
 
     emporio                       new conversation
     emporio --session ana         resume (or start) a saved conversation
-    emporio --mode rag --trace    use the RAG policy lookup and show tool calls
+    emporio --mode rag_parent --trace    use the RAG policy lookup and show tool calls
 """
 
 import argparse
@@ -17,7 +17,7 @@ GREETING = "Oi! Eu sou o Tom, da Empório da Música 🎸 Como posso te ajudar?"
 def main() -> None:
     parser = argparse.ArgumentParser(description="Chat with the Empório da Música agent")
     parser.add_argument("--session", help="conversation id to save and resume")
-    parser.add_argument("--mode", choices=["sections", "rag", "rag_parent"], default=config.POLICY_MODE)
+    parser.add_argument("--mode", choices=["sections", "rag_parent"], default=config.POLICY_MODE)
     parser.add_argument("--model", default=config.GEMINI_MODEL)
     parser.add_argument("--trace", action="store_true", help="print tool calls, latency and tokens")
     args = parser.parse_args()

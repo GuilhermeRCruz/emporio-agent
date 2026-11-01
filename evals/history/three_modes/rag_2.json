@@ -1,0 +1,223 @@
+[
+  {
+    "id": "policy_payment_methods",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Aceitamos diversas formas de pagamento na Empório da Música:\n\n• **PIX**: à vista com 5% de desconto (válido para produtos com preço de tabela).\n• **Cartão de Débito**: à vista (todas as bandeiras).\n• **Boleto Bancário**: à vista, com compensação em até 3 dias úteis.\n• **Cartão de Crédito**: em até 12x sem juros (com parcela mínima de R$ 100,00).\n\nPara compras acima de R$ 2.000,00, também é possível combinar formas de pagamento (como PIX + cartão).\n\nPosso te ajudar com mais alguma coisa?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quais são as formas de pagamento disponíveis?\"}"
+      }
+    ],
+    "seconds": 7.978792125009932,
+    "llm_calls": 2,
+    "input_tokens": 5089,
+    "cached_tokens": 0,
+    "output_tokens": 178
+  },
+  {
+    "id": "policy_installments_limit",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": null,
+    "answer": "Não dá para parcelar R$ 600 em 10x. Para parcelar de 7x a 12x sem juros, a parcela mínima precisa ser de R$ 100,00.\n\nPara um valor de R$ 600,00, o parcelamento máximo sem juros é em até 6x de R$ 100,00.\n\nSe preferir pagar no PIX, você ganha 5% de desconto e o valor fica R$ 570,00 (se o produto não estiver em promoção).\n\nPosso te ajudar com mais alguma dúvida sobre pagamentos ou algum instrumento?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quais são as regras de parcelamento de cartão de crédito e valor mínimo por parcela?\"}"
+      },
+      {
+        "name": "simulate_payment",
+        "arguments": "{\"amount\": 600}"
+      }
+    ],
+    "seconds": 4.698244541999884,
+    "llm_calls": 3,
+    "input_tokens": 7998,
+    "cached_tokens": 0,
+    "output_tokens": 194
+  },
+  {
+    "id": "policy_defect_window",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "O prazo para trocar um instrumento com defeito direto com a gente é de até 30 dias corridos após a compra. \n\nAlém disso, pela garantia legal, a cobertura contra defeitos de fabricação é de 90 dias a contar do recebimento. Caso precise acionar a garantia após os 30 dias iniciais, a gente também pode intermediar com o fabricante!\n\nSe você comprou um produto com a gente e está com defeito, me avisa! Posso verificar seu pedido ou ajudar no que precisar.",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Qual o prazo para solicitar troca ou devolução de produto com defeito?\"}"
+      }
+    ],
+    "seconds": 3.0716893750359304,
+    "llm_calls": 2,
+    "input_tokens": 4988,
+    "cached_tokens": 0,
+    "output_tokens": 143
+  },
+  {
+    "id": "policy_free_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para entregas em Campo Grande, o frete é grátis nas compras acima de R$ 500,00! \n\nSe o pedido for abaixo de R$ 500,00, a taxa de entrega é fixa em R$ 35,00. O prazo fica entre 1 e 3 dias úteis.\n\nPosso te ajudar a escolher algum instrumento hoje?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"O frete é grátis para entregas em Campo Grande MS?\"}"
+      }
+    ],
+    "seconds": 7.3466506249969825,
+    "llm_calls": 2,
+    "input_tokens": 5188,
+    "cached_tokens": 0,
+    "output_tokens": 118
+  },
+  {
+    "id": "policy_split_payment",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Pode sim! A combinação de pagamentos (como PIX + cartão) é permitida para compras acima de R$ 2.000,00. \n\nSe você já estiver de olho em algum instrumento específico, me avisa que vejo os detalhes e ajudo você com a compra!",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Posso pagar uma parte no PIX e o resto no cartão de crédito?\"}"
+      }
+    ],
+    "seconds": 3.005708582990337,
+    "llm_calls": 2,
+    "input_tokens": 5065,
+    "cached_tokens": 0,
+    "output_tokens": 97
+  },
+  {
+    "id": "policy_warranty_strings",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "A garantia não cobre a troca de cordas arrebentadas, pois elas são consideradas peças de desgaste natural do instrumento. \n\nAlém disso, como não vendemos acessórios aqui na Empório da Música (apenas os instrumentos), sugiro procurar uma loja especializada em acessórios musicais para adquirir um jogo novo de cordas.\n\nPosso te ajudar com mais alguma coisa sobre nossos instrumentos?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A garantia cobre troca ou substituição de corda de violão arrebentada?\"}"
+      }
+    ],
+    "seconds": 2.7427407079958357,
+    "llm_calls": 2,
+    "input_tokens": 4960,
+    "cached_tokens": 0,
+    "output_tokens": 114
+  },
+  {
+    "id": "policy_return_shipping",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Em caso de devolução por arrependimento em compras online, o frete de devolução é por conta da loja! \n\nVocê tem até 7 dias corridos após o recebimento para solicitar, desde que o produto esteja na embalagem original, sem sinais de uso e com todos os acessórios e manuais.\n\nSe quiser que eu dê uma olhada no seu pedido para seguir com a solicitação, me informa o número do pedido e o e-mail ou telefone do seu cadastro?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Quem paga o frete na devolução por arrependimento?\"}"
+      }
+    ],
+    "seconds": 2.7627079999656416,
+    "llm_calls": 2,
+    "input_tokens": 4972,
+    "cached_tokens": 0,
+    "output_tokens": 131
+  },
+  {
+    "id": "policy_privacy",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Não compartilhamos seus dados com terceiros para fins de marketing. \n\nUsamos suas informações apenas para processar e entregar seus pedidos, atualizar sobre a entrega, cumprir obrigações fiscais e mandar novidades (somente se você autorizar). Estamos em total conformidade com a LGPD.\n\nPosso te ajudar com mais alguma dúvida?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A loja compartilha ou passa dados dos clientes para outras empresas? Privacidade de dados.\"}"
+      }
+    ],
+    "seconds": 2.828808166028466,
+    "llm_calls": 2,
+    "input_tokens": 5067,
+    "cached_tokens": 0,
+    "output_tokens": 106
+  },
+  {
+    "id": "policy_warranty_followup",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "A garantia legal da loja é de 90 dias para defeitos de fabricação. Como o violão já tem 4 meses de uso, você precisará acionar a garantia do fabricante, que geralmente vai de 6 meses a 2 anos (a depender da marca e do certificado que acompanha o produto).\n\nA garantia cobre o empenamento se for comprovado defeito de fabricação — desde que não tenha sido causado por mau uso, quedas ou exposição a condições climáticas extremas.\n\nSe você comprou o instrumento com a gente, nós podemos intermediar esse processo com o fabricante para você! Quer que eu te ajude com isso?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A garantia cobre cordas arrebentadas?\"}"
+      },
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"O que a garantia cobre e qual o prazo de garantia para empenamento do braço do violão?\"}"
+      },
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Garantia contratual do fabricante ou prazo de garantia dos instrumentos\"}"
+      }
+    ],
+    "seconds": 8.797451791993808,
+    "llm_calls": 5,
+    "input_tokens": 13108,
+    "cached_tokens": 0,
+    "output_tokens": 273
+  },
+  {
+    "id": "policy_shipping_other_city",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Para envios para Dourados e outras cidades, os prazos variam de acordo com a opção de envio escolhida:\n\n• **SEDEX (Correios):** 2 a 5 dias úteis\n• **Jadlog:** 3 a 8 dias úteis\n• **PAC (Correios):** 5 a 12 dias úteis\n\nO valor exato do frete e o prazo final são calculados ao colocar o produto no carrinho e informar o CEP. \n\nPosso te ajudar com a escolha de algum instrumento?",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"Qual é o prazo de entrega para outras cidades de Mato Grosso do Sul como Dourados?\"}"
+      }
+    ],
+    "seconds": 2.8081271660048515,
+    "llm_calls": 2,
+    "input_tokens": 5163,
+    "cached_tokens": 0,
+    "output_tokens": 152
+  },
+  {
+    "id": "policy_mouthpiece_exchange",
+    "group": "policy",
+    "passed": true,
+    "failures": [],
+    "retrieval_ok": true,
+    "answer": "Não fazemos troca de boquilhas por questões de higiene, e também não trabalhamos com a venda de acessórios. \n\nRecomendo procurar uma loja especializada em acessórios musicais para te ajudar com isso!\n\nSe precisar de ajuda com a escolha de algum instrumento musical do nosso catálogo, fico à disposição!",
+    "tool_calls": [
+      {
+        "name": "search_store_policy",
+        "arguments": "{\"question\": \"A loja vende ou faz manutenção de acessórios como boquilhas de instrumentos de sopro?\"}"
+      }
+    ],
+    "seconds": 2.655161084025167,
+    "llm_calls": 2,
+    "input_tokens": 5038,
+    "cached_tokens": 0,
+    "output_tokens": 98
+  }
+]
