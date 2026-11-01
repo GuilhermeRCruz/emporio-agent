@@ -307,6 +307,6 @@
     "tools": [
       "register_ticket"
     ],
-    "judge": "Acknowledges the complaint with empathy and gives a ticket number with the 24 business hours follow-up. Does not claim anything was done before the ticket exists."
+    "judge": "Acknowledges the complaint with empathy and gives a ticket number with the 24 business hours follow-up."
   }
 ]
