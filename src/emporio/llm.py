@@ -5,6 +5,8 @@ from functools import lru_cache
 from google import genai
 from google.genai import types
 
+from emporio import config  # noqa: F401  loads .env before the client reads GEMINI_API_KEY
+
 # Free-tier keys hit 429 quickly during evals; back off instead of failing the run.
 RETRY = types.HttpRetryOptions(attempts=6, initial_delay=2.0, max_delay=60.0, http_status_codes=[429, 500, 503])
 
