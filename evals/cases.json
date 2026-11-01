@@ -216,6 +216,37 @@
     "judge": "Says customer data is not shared with third parties for marketing, mentions LGPD or that the customer can ask for deletion."
   },
   {
+    "id": "policy_warranty_followup",
+    "group": "policy",
+    "turns": [
+      "A garantia cobre corda arrebentada?",
+      "E se o braço do violão empenar depois de 4 meses de uso, alguém cobre?"
+    ],
+    "policy_section": "garantia",
+    "judge": "Says the 90-day legal warranty no longer applies after 4 months, but the manufacturer's own warranty (6 months to 2 years, per the certificate) may cover a manufacturing defect, and the store can help with it. Must not say nobody covers it."
+  },
+  {
+    "id": "policy_shipping_other_city",
+    "group": "policy",
+    "turns": [
+      "Moro em Dourados, quanto tempo demora pra chegar uma compra?"
+    ],
+    "policy_section": "frete_e_entregas",
+    "must_include": [
+      "SEDEX"
+    ],
+    "judge": "Treats Dourados as outside the Campo Grande metro area and gives the carrier delivery times (PAC 5 to 12, SEDEX 2 to 5, Jadlog 3 to 8 business days). Must not promise the 1 to 3 day local motoboy delivery."
+  },
+  {
+    "id": "policy_mouthpiece_exchange",
+    "group": "policy",
+    "turns": [
+      "Comprei um saxofone em outro lugar mas queria saber: vocês trocam boquilha de instrumento de sopro?"
+    ],
+    "policy_section": "trocas_e_devolucoes",
+    "judge": "Says mouthpieces of wind instruments are not eligible for exchange, for hygiene reasons."
+  },
+  {
     "id": "order_asks_for_identification",
     "group": "orders",
     "turns": [

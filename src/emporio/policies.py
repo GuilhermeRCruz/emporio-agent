@@ -1,10 +1,11 @@
-"""Two interchangeable ways for the agent to read the store policy manual.
+"""Interchangeable ways for the agent to read the store policy manual.
 
-sections  The model picks a section key from a closed list; Python returns that section.
-          No retrieval step that can miss, no extra network call.
-rag       The question is embedded (Gemini embeddings) and the closest subsection chunks are returned.
+sections    The model picks a section key from a closed list; Python returns that section.
+            No retrieval step that can miss, no extra network call.
+rag         The question is embedded (Gemini embeddings) and the closest subsection chunks are returned.
+rag_parent  Same search over subsection chunks, but the whole sections they belong to are returned.
 
-POLICY_MODE selects which one the agent gets. The evals run both.
+POLICY_MODE selects which one the agent gets. The evals run all of them.
 """
 
 import json
@@ -17,6 +18,7 @@ from emporio import llm
 from emporio.config import EMBEDDINGS_PATH, GEMINI_EMBEDDING_MODEL, POLICIES_PATH
 
 RAG_TOP_K = 3
+PARENT_MAX_SECTIONS = 2  # top chunks often span two sections (garantia + trocas)
 EMBEDDING_DIMENSIONS = 768
 
 
@@ -65,15 +67,36 @@ def _chunk_index() -> np.ndarray:
     return vectors
 
 
-def search(question: str, top_k: int = RAG_TOP_K) -> dict:
+def _rank(question: str) -> tuple[list[dict], np.ndarray, np.ndarray]:
     chunks = load()["chunks"]
-    index = _chunk_index()
-    query = _embed([question], "RETRIEVAL_QUERY")[0]
-    scores = index @ query
-    best = np.argsort(-scores)[:top_k]
+    scores = _chunk_index() @ _embed([question], "RETRIEVAL_QUERY")[0]
+    return chunks, scores, np.argsort(-scores)
+
+
+def search(question: str, top_k: int = RAG_TOP_K) -> dict:
+    chunks, scores, order = _rank(question)
+    best = order[:top_k]
     return {
         "trechos": [
             {"secao": chunks[i]["title"], "texto": chunks[i]["text"], "similaridade": round(float(scores[i]), 3)}
             for i in best
         ]
     }
+
+
+def search_parent(question: str, top_k: int = RAG_TOP_K, max_sections: int = PARENT_MAX_SECTIONS) -> dict:
+    """Parent document retrieval: match on the small chunks, return their whole sections.
+
+    Small chunks keep the match precise; the parent section gives the model the rest of the
+    context (asking about strings returns 8.3, but the answer to the follow-up lives in 8.2).
+    """
+    chunks, scores, order = _rank(question)
+    sections, seen = [], set()
+    for i in order[:top_k]:
+        key = chunks[i]["section"]
+        if key not in seen:
+            seen.add(key)
+            sections.append(get_section(key) | {"similaridade": round(float(scores[i]), 3)})
+        if len(sections) == max_sections:
+            break
+    return {"secoes": sections}
