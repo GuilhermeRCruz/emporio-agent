@@ -99,12 +99,35 @@ def store_tools() -> list[dict]:
     ]
 
 
+# What each section of the manual covers. Bare section names were not enough: asked whether
+# wind instrument mouthpieces can be exchanged, the model took it for an accessories question
+# and answered without reading "trocas_e_devolucoes", where the hygiene rule lives.
+SECTION_CONTENTS = {
+    "sobre_a_loja": "história, dados da empresa, o que a loja vende e o que não vende",
+    "horario": "horário de funcionamento e datas especiais",
+    "pagamento": "formas de pagamento, desconto no PIX, parcelamento e parcela mínima, combinar formas",
+    "trocas_e_devolucoes": "arrependimento (7 dias), troca por defeito (30 dias), troca por preferência, "
+    "itens que não podem ser trocados (personalizados, venda final, boquilhas de sopro), intermediação "
+    "da garantia com o fabricante",
+    "frete_e_entregas": "frete em Campo Grande, prazos e transportadoras para outras cidades, rastreio, avarias",
+    "promocoes": "campanhas do ano, promoção não acumula com PIX, sem reserva de preço",
+    "atendimento": "tom de voz, escopo, produto esgotado ou descontinuado, promoção expirada, reclamações",
+    "garantia": "garantia legal de 90 dias, garantia do fabricante, o que a garantia não cobre",
+    "privacidade": "LGPD, uso, compartilhamento e exclusão de dados",
+    "disposicoes_finais": "casos não cobertos pelo manual",
+}
+
+
 def policy_tool(mode: str) -> dict:
     if mode == "sections":
         return _fn(
             "get_store_policy",
-            "Lê uma seção do manual de políticas da loja. Use para regras de pagamento, trocas e devoluções, "
-            "frete, promoções, garantia, privacidade e atendimento.",
+            "Lê uma seção do manual de políticas da loja. Use para qualquer regra de pagamento, trocas e "
+            "devoluções, frete, promoções, garantia, privacidade e atendimento, inclusive quando a pergunta "
+            "envolver um item que a loja não vende. Se a dúvida cruzar dois temas, chame uma vez para cada "
+            "seção. Conteúdo de cada seção: "
+            + "; ".join(f"{key}: {SECTION_CONTENTS[key]}" for key in policies.section_keys())
+            + ".",
             {"section": {"type": "string", "enum": policies.section_keys(), "description": "Seção do manual."}},
         )
     if mode == "rag_parent":
