@@ -2,7 +2,7 @@
 
 from typing import Callable
 
-from emporio import policies, store
+from emporio import policies, store, tickets
 
 
 def _fn(name: str, description: str, properties: dict, required: list[str] | None = None) -> dict:
@@ -84,6 +84,18 @@ def store_tools() -> list[dict]:
             },
             required=[],
         ),
+        _fn(
+            "register_ticket",
+            "Abre um chamado para a equipe humana: reclamação, entrega atrasada, devolução que depende da "
+            "equipe, caso que o manual não cobre ou pedido de atendente. Devolve o número do chamado.",
+            {
+                "reason": {"type": "string", "enum": tickets.REASONS, "description": "Motivo do chamado."},
+                "summary": {"type": "string", "description": "Resumo do caso em uma ou duas frases, para a equipe."},
+                "order_id": _optional("integer", "Número do pedido, se houver."),
+                "contact": _optional("string", "E-mail ou telefone que o cliente informou, se houver."),
+            },
+            required=["reason", "summary"],
+        ),
     ]
 
 
@@ -112,6 +124,7 @@ def dispatcher(mode: str) -> dict[str, Callable]:
         "lookup_order": store.lookup_order,
         "check_return": store.check_return,
         "simulate_payment": store.simulate_payment,
+        "register_ticket": tickets.register_ticket,
     }
     if mode == "sections":
         handlers["get_store_policy"] = policies.get_section

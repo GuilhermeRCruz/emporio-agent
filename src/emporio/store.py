@@ -233,7 +233,7 @@ def lookup_order(order_id: int, email_or_phone: str) -> dict:
         if row["status"] == "shipped" and date.fromisoformat(row["estimated_delivery"]) < now().date():
             out["atencao"] = (
                 "A previsão de entrega já passou e o pedido ainda consta como enviado. "
-                "Peça desculpas e encaminhe para a equipe verificar com a transportadora."
+                "Peça desculpas e abra um chamado com register_ticket para a equipe verificar com a transportadora."
             )
     if row["notes"]:
         out["observacao"] = row["notes"]
@@ -259,7 +259,7 @@ def check_return(order_id: int, email_or_phone: str, reason: str) -> dict:
         return base | {
             "elegivel": None,
             "motivo": "O pedido ainda não foi entregue. O manual não trata cancelamento antes da "
-            "entrega: encaminhe para a equipe.",
+            "entrega: abra um chamado com register_ticket para a equipe decidir.",
         }
 
     received = date.fromisoformat(row["estimated_delivery"])
@@ -290,6 +290,7 @@ def check_return(order_id: int, email_or_phone: str, reason: str) -> dict:
         purchase = date.fromisoformat(row["order_date"])
         store_deadline = purchase + timedelta(days=DEFECT_WINDOW_DAYS)
         warranty_deadline = received + timedelta(days=LEGAL_WARRANTY_DAYS)
+        base["comprado_em"] = _br_date(purchase.isoformat())
         if today <= store_deadline:
             return base | {
                 "regra": "4.2 Trocas por Defeito",
@@ -300,7 +301,10 @@ def check_return(order_id: int, email_or_phone: str, reason: str) -> dict:
         return base | {
             "regra": "4.2 Trocas por Defeito e 8. Garantia",
             "elegivel": False,
-            "motivo": f"A troca direta na loja vale até 30 dias após a compra ({_br_date(store_deadline.isoformat())}).",
+            "motivo": (
+                f"A troca direta na loja vale até 30 dias corridos contados da data da COMPRA "
+                f"({_br_date(purchase.isoformat())}), ou seja, terminou em {_br_date(store_deadline.isoformat())}."
+            ),
             "alternativa": (
                 "Acionar a garantia do fabricante (6 meses a 2 anos, conforme o certificado). "
                 "A loja pode intermediar se o cliente pedir."

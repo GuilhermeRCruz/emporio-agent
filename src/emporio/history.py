@@ -4,11 +4,14 @@ Kept in its own SQLite file because the store database is opened read-only.
 """
 
 import json
+import os
 import sqlite3
+from pathlib import Path
 
 from emporio.config import PROCESSED_DIR
 
-HISTORY_PATH = PROCESSED_DIR / "conversations.db"
+# Writable state (conversations and tickets). Evals point it elsewhere to keep runs isolated.
+HISTORY_PATH = Path(os.getenv("EMPORIO_STATE_DB", PROCESSED_DIR / "conversations.db"))
 
 
 def _connect() -> sqlite3.Connection:

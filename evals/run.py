@@ -22,6 +22,7 @@ from datetime import datetime
 from pathlib import Path
 
 os.environ.setdefault("EMPORIO_NOW", "2026-10-31T10:00:00")
+os.environ.setdefault("EMPORIO_STATE_DB", str(Path(__file__).parent / "results" / "state.db"))
 
 from google.genai import types  # noqa: E402
 

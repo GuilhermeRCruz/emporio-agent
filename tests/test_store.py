@@ -97,3 +97,14 @@ def test_installment_tiers():
     assert "até 6x" in store.simulate_payment(amount=500)["credito"]  # 500/6 = 83 >= 80
     assert "até 3x" in store.simulate_payment(amount=159.9)["credito"]
     assert store.simulate_payment(amount=2500)["combinar_formas"] is True
+
+
+def test_ticket_is_persisted(tmp_path, monkeypatch):
+    from emporio import tickets
+
+    monkeypatch.setattr(tickets, "HISTORY_PATH", tmp_path / "state.db")
+    first = tickets.register_ticket("reclamacao", "Cliente reclamou do atendimento", contact="a@b.com")
+    second = tickets.register_ticket("atraso_na_entrega", "Pedido 8 atrasado", order_id=8)
+    assert first["chamado"] == "#1" and second["chamado"] == "#2"
+    assert "24 horas úteis" in first["retorno_da_equipe"]
+    assert "erro" in tickets.register_ticket("qualquer", "x")
