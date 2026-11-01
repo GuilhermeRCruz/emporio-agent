@@ -6,31 +6,29 @@ Model `gemini-3.5-flash`, policy mode `sections`, clock pinned to 31/10/2026 10:
 
 **Cliente:** Boa tarde, queria saber onde está meu pedido 8. Telefone (67) 99654-7821
 
-> 🔧 `lookup_order({"order_id": 8, "email_or_phone": "(67) 99654-7821"})`
-> 🔧 `register_ticket({"reason": "atraso_na_entrega", "summary": "Pedido 8 com atraso na entrega. Previsão era 28/02/2026 e consta como enviado. Rastreio: BRJL5544332BR.", "contact": "(67) 99654-7821", "order_id": 8})`
+> 🔧 `lookup_order({"email_or_phone": "(67) 99654-7821", "order_id": 8})`
+> 🔧 `register_ticket({"order_id": 8, "summary": "Pedido 8 com entrega atrasada. Previsão era 28/02/2026. Código de rastreio BRJL5544332BR.", "contact": "(67) 99654-7821", "reason": "atraso_na_entrega"})`
 
-**Tom:** Olá, Ana! 
+**Tom:** Olá, Ana! Bom dia!
 
-O seu pedido nº 8 (Kala KA-C Concert Mogno) consta com o status **enviado**, sob o código de rastreio **BRJL5544332BR**. 
+O seu pedido 8 (Kala KA-C Concert Mogno) consta como enviado com o código de rastreio **BRJL5544332BR**. 
 
-No entanto, vi aqui que a previsão de entrega era até 28/02/2026. Peço desculpas por esse atraso! Já abri um chamado interno para a nossa equipe verificar diretamente com a transportadora o que aconteceu. 
+Pedimos desculpas pelo transtorno, pois vi que a previsão de entrega era até 28/02/2026 e o pedido está atrasado.
 
-O número do seu protocolo é **#1** e a nossa equipe te dará um retorno em até **24 horas úteis**.
+Para resolver isso o quanto antes, abri o chamado **#1** para a nossa equipe verificar diretamente com a transportadora. O prazo de retorno da equipe é de até 24 horas úteis. 
 
-Se precisar de algo mais enquanto isso, estou à disposição!
+Posso te ajudar com mais alguma coisa por enquanto?
 
-<sub>3.8 s</sub>
+<sub>4.0 s</sub>
 
 **Cliente:** Já era pra ter chegado faz tempo, to bem chateada
 
-> 🔧 `lookup_order({"email_or_phone": "(67) 99654-7821", "order_id": 8})`
+> 🔧 `get_store_policy({"section": "horario"})`
 
-**Tom:** Entendo perfeitamente a sua chateação, Ana. Você tem toda razão em ficar chateada com esse atraso, e peço desculpas por essa situação.
+**Tom:** Entendo perfeitamente o seu chateamento, Ana, e peço mil desculpas por essa situação. Não é essa a experiência que queremos para você.
 
-Como o chamado **#1** já está aberto em nosso sistema sobre esse mesmo atraso do pedido 8, nossa equipe já foi acionada para cobrar um posicionamento urgente da transportadora.
+Como hoje é sábado e a nossa loja está aberta até as 13:00, o chamado que abri sob o número **#1** já está com a nossa equipe para verificarmos o atraso junto à transportadora com prioridade. O prazo máximo de retorno é de até 24 horas úteis.
 
-Como a loja física está aberta hoje até às 13h, o pessoal do atendimento já está ciente e vai priorizar o seu caso para te dar um retorno assim que tiverem novidades. 
+Assim que a equipe tiver uma resposta da transportadora, entraremos em contato com você pelo seu telefone cadastrado.
 
-Se quiser acompanhar ou adicionar mais alguma informação, estou por aqui!
-
-<sub>2.7 s</sub>
+<sub>9.6 s</sub>

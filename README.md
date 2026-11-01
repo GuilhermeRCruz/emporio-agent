@@ -10,12 +10,13 @@ Cliente: Gostei do Yamaha C40. Dá pra parcelar em 10x?
   🔧 get_product({"name": "Yamaha C40"})
   🔧 get_store_policy({"section": "pagamento"})
   🔧 simulate_payment({"product_id": 81})
-Tom:     Não dá para fazer em 10x porque a nossa parcela mínima para 7x a 12x é de R$ 100,00.
-         Para o Yamaha C40 (R$ 599,90), você consegue parcelar em até 6x de R$ 99,98 sem juros
-         no cartão de crédito! Ou, se preferir no PIX, ele sai por R$ 569,90 com o desconto de 5%.
+Tom:     Em 10x não é possível para o Yamaha C40 Nylon Natural.
+         Como o valor dele é R$ 599,90, o parcelamento máximo é em 6x sem juros de R$ 99,98,
+         por conta da regra de parcela mínima de R$ 100,00 para opções de 7x a 12x.
+         Você também tem a opção do PIX por R$ 569,90 (com 5% de desconto).
 ```
 
-**Results:** 27/27 end-to-end eval cases with the default setup, 2.4 s mean latency per answer, and a measured comparison of section lookup vs RAG for the policy manual ([Evaluation](#evaluation)).
+**Results:** 30/30 end-to-end eval cases with the default setup, about 2.5 s per answer, and a measured comparison of three ways to look up the policy manual ([Evaluation](#evaluation)).
 
 ## Contents
 
@@ -44,15 +45,15 @@ emporio --trace                 # chat in the terminal, showing tool calls, late
 More commands:
 
 ```bash
-emporio --mode rag --trace      # same agent, policies looked up with RAG instead of by section
+emporio --mode rag_parent --trace  # same agent, policies looked up with RAG instead of by section
 emporio --session ana           # saves the conversation; run it again to resume
 pytest                          # 15 deterministic tests of the data layer and tickets, no LLM
-python evals/run.py             # end-to-end eval on both policy modes (about 90 API calls)
+python evals/run.py             # end-to-end eval on both policy modes (about 100 API calls)
 python conversations/record.py  # re-records the example conversations
 ```
 
 > **About the free tier.** A free key is enough to chat, but in November 2026 the free tier allows
-> only 20 requests per day per model, and a full eval run needs about 90. The evals in this
+> only 20 requests per day per model, and a full eval run needs about 100. The evals in this
 > repository were run on a key with billing enabled (a full run costs a few US cents).
 
 ## Architecture
@@ -67,7 +68,7 @@ python conversations/record.py  # re-records the example conversations
               search_products                get_store_policy  register_ticket
               get_product                     (sections mode)   hand-off queue for
               lookup_order                   search_store_policy the human team
-              check_return                    (rag mode)
+              check_return                    (rag_parent mode)
               simulate_payment
 ```
 
@@ -104,31 +105,50 @@ The model chooses tools; Python answers them. Six narrow tools cover the store's
 * **Unavailable products** come back with three available alternatives of the same category and
   string type, as manual 7.3 asks.
 
-### 2. Two ways to read the policy manual, measured
+### 2. Three ways to read the policy manual, measured
 
-The user asked for the policy lookup to be decided with numbers, so both are implemented behind
-`POLICY_MODE`:
+The policy lookup was decided with numbers, not opinion. Three strategies were built behind
+`POLICY_MODE` and run on the same cases ([details](evals/history/policy_modes.md)):
 
 | Mode | How it works |
 |---|---|
-| `sections` (default) | The tool takes one of the manual's 10 section keys (an enum); Python returns that section. |
-| `rag` | The question is embedded with `gemini-embedding-001` (768 dimensions, `RETRIEVAL_QUERY` vs `RETRIEVAL_DOCUMENT` task types) and the 3 closest chunks are returned. |
+| `sections` (default) | The tool takes one of the manual's 10 section keys (an enum, with what each section contains); Python returns that section. |
+| `rag` (removed) | The question is embedded with `gemini-embedding-001` (768 dimensions, `RETRIEVAL_QUERY` vs `RETRIEVAL_DOCUMENT` task types) and the 3 closest chunks are returned. |
+| `rag_parent` | Same search over the same chunks, but the whole sections those chunks belong to are returned (parent document retrieval, up to 2 sections). |
 
 Chunking follows the manual's own structure: one chunk per subsection (4.1 regret, 4.2 defect,
 ...), or the whole section when it has none, always prefixed with the section title so a chunk
-like "30 dias corridos" still says it is about defects. 25 chunks, all under 800 characters.
+like "30 dias corridos" still says it is about defects. 25 chunks, all under 800 characters, one
+embedding each, computed once and cached on disk.
 
-Result over the 8 policy cases, 3 runs each ([details](evals/history/policy_mode_repeats.md)):
+**Round 1**, 11 policy cases × 3 runs per mode:
 
-| Mode | Passed | Mean latency | Median latency |
-|---|---|---|---|
-| **sections** | **24/24** | **2.60 s** | **2.42 s** |
-| rag | 24/24 | 3.14 s | 3.00 s |
+| Mode | Passed | Median latency |
+|---|---|---|
+| sections | 30/33 | 2.47 s |
+| rag | 32/33 | 3.07 s |
+| rag_parent | 32/33 | 3.07 s |
 
-Same accuracy, but RAG pays an embedding round trip (about 0.55 s) on every policy question and
-sends about the same number of tokens, since three chunks are roughly one section. With an
-8-page manual, sections win. RAG stays in the code as the path for when the manual grows past
-what fits in a section lookup.
+* Plain `rag` can cut the context a follow-up needs. Asked about strings it returns 8.3 ("what
+  the warranty does not cover"), but the follow-up about a warped neck needs 8.2 and the store's
+  help with the manufacturer (4.2), which were not among the three chunks. That is why
+  `rag_parent` was built. The two tied on accuracy and latency, so plain `rag` was removed.
+* `sections` failed twice without calling the tool at all: asked whether wind instrument
+  mouthpieces can be exchanged, the model took it for an accessories question. It only saw bare
+  section names, so the tool description now lists what each section contains.
+
+**Round 2**, run sequentially for a fair latency comparison:
+
+| Mode | Passed | Median latency | Mean latency | Input tokens per case |
+|---|---|---|---|---|
+| **sections** | **33/33** | **2.41 s** | **2.84 s** | 6528 |
+| rag_parent | 32/33 | 2.88 s | 3.24 s | 6031 |
+
+Sections is the default: at least as accurate and about 0.45 s faster on every policy question,
+because any RAG pays an embedding round trip before the model can answer. It sends about 500
+more input tokens per call (the longer tool description). With an 8-page manual split into clear
+sections, the model reading a table of contents beats similarity search. `rag_parent` stays as
+the tested path for a manual too large to read section by section.
 
 ### 3. Model and provider: Gemini 3.5 Flash with minimal thinking
 
@@ -185,7 +205,7 @@ the tool confirms it, and reuses the ticket if the customer complains again.
 
 ## Evaluation
 
-`python evals/run.py` plays 27 cases through the real agent with the clock pinned to
+`python evals/run.py` plays 30 cases through the real agent with the clock pinned to
 Saturday 31/10/2026 10:00. A case passes only if all of its checks pass:
 
 * **tools**: the expected tools were called, or a forbidden one was not (no order lookup before
@@ -197,15 +217,15 @@ Saturday 31/10/2026 10:00. A case passes only if all of its checks pass:
   against a one-line rubric: declines off-topic questions, asks for identification, does not
   grant a fake discount under prompt injection.
 
-Cases: catalog (8), store info (3), policies (8), orders (5), scope (3). RAG runs only the policy
-cases, since the others never touch the policy tool.
+Cases: catalog (8), store info (3), policies (11), orders (5), scope (3). `rag_parent` runs only the
+policy cases, since the others never touch the policy tool.
 
 | Policy mode | Cases passed | Policy cases | Right section retrieved | Mean latency | p95 latency |
 |---|---|---|---|---|---|
-| **sections** (default) | **27/27** | 7/7 | 7/7 | 2.42 s | 3.53 s |
-| rag | 8/8 | 7/7 | 7/7 | 3.09 s | 4.21 s |
+| **sections** (default) | **30/30** | 10/10 | 10/10 | 2.56 s | 4.10 s |
+| rag_parent | 10/11 | 9/10 | 10/10 | 3.25 s | 3.55 s |
 
-Full report: [`evals/history/run6_final.md`](evals/history/run6_final.md). Latency is measured
+Full report: [`evals/history/run7_final.md`](evals/history/run7_final.md). Latency is measured
 end to end per case, including every model call and tool execution.
 
 ### How the numbers moved
@@ -220,7 +240,9 @@ the git log:
 | [3](evals/history/run3_full.md) | 3.5 Flash | 26/26 | 8/8 | After switching model, and after finding that the judge read only the last paragraph of multi-paragraph answers and failed correct replies (fixed with tagged transcripts). |
 | [4](evals/history/run4_final.md) | 3.5 Flash | 27/27 | 8/8 | Added the ticket queue and a complaint case; tracking code made mandatory for shipped orders. |
 | [5](evals/history/run5_judge_rubric_flaw.md) | 3.5 Flash | 26/27 | 8/8 | Duplicate ticket on a repeated complaint fixed. The one failure was a correct answer: the rubric asked the judge to check tool order, which it cannot see (the tool check already covers it). Rubric fixed. |
-| [6](evals/history/run6_final.md) | 3.5 Flash | 27/27 | 8/8 | Final. |
+| [6](evals/history/run6_final.md) | 3.5 Flash | 27/27 | 8/8 | All passing; three harder policy cases added next to separate the modes. |
+| [policy modes](evals/history/policy_modes.md) | 3.5 Flash | 30/33 then 33/33 | 32/33 | Three-mode comparison: plain RAG removed, section contents added to the sections tool. |
+| [7](evals/history/run7_final.md) | 3.5 Flash | 30/30 | 10/11 (rag_parent) | Final. |
 
 ### Example conversations
 
@@ -262,10 +284,10 @@ The challenge asks to document reasonable interpretations. These are the ones th
 
 ## Known limitations and next steps
 
-* **Latency.** About 2.4 s on average, mostly two sequential model calls (decide tool, then
+* **Latency.** About 2.5 s on average, mostly two sequential model calls (decide tool, then
   answer). Streaming the final answer would make it feel faster; a router that answers fixed
   facts without the tool round would cut the simple cases.
-* **Small eval set and an LLM judge.** 27 cases and one judge. The judge was wrong once
+* **Small eval set and an LLM judge.** 30 cases and one judge. The judge was wrong once
   already (fixed). Next: a larger set written with the store team, repeated runs per change,
   and a few human-labelled answers to calibrate the judge.
 * **Identity check is weak.** Order number plus e-mail or phone is fine for a prototype; a real
@@ -277,8 +299,9 @@ The challenge asks to document reasonable interpretations. These are the ones th
 * **No prompt caching on Gemini 3.5 Flash.** Implicit caching reported 0 cached tokens with this
   model (it did hit 50 to 80% on 2.5 Flash). Explicit context caching of the system prompt and
   tools would cut cost.
-* **Policy retrieval at scale.** If the manual grows, RAG (already implemented) becomes the
-  default, ideally hybrid with BM25 and a reranker, and re-measured with the same evals.
+* **Policy retrieval at scale.** If the manual grows, `rag_parent` (already implemented and
+  measured) becomes the default, ideally hybrid with BM25 and a reranker, re-measured with the
+  same evals.
 
 ## Use of AI coding assistants
 
@@ -292,8 +315,10 @@ in Portuguese. The workflow:
 * **Design decisions were mine, argued with the assistant.** I asked for the structure that would
   give the best accuracy and speed; we settled on function calling over SQLite. I proposed
   building both a RAG and a pure Python lookup for the policies and measuring them instead of
-  picking one by opinion. I switched the provider from OpenAI to Gemini midway (one commit shows
-  the switch). When the eval was about to make about 150 API calls I questioned it, which led
+  picking one by opinion. Discussing how RAG chunks relate to the manual's chapters, I suggested
+  searching the small pieces but organising them by chapter, which is parent document retrieval
+  and became `rag_parent`; after the comparison I chose which mode to remove. I switched the
+  provider from OpenAI to Gemini midway (one commit shows the switch). When the eval was about to make about 150 API calls I questioned it, which led
   to running RAG only on the policy cases.
 * **Implementation and iteration.** Claude wrote most of the code, the tests and the eval harness,
   committed step by step as I asked, ran the evals, read the failing answers and proposed fixes.
@@ -309,7 +334,7 @@ in Portuguese. The workflow:
 src/emporio/
   ingest.py      raw CSV and PDF to SQLite, policy sections and chunks, data quality report
   store.py       catalog, order, return and payment queries (all numbers come from here)
-  policies.py    policy lookup: sections or RAG
+  policies.py    policy lookup: sections or rag_parent
   tickets.py     hand-off queue for the human team
   tools.py       tool schemas and dispatch
   prompts.py     persona, rules and clock message

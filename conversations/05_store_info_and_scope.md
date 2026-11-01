@@ -6,28 +6,32 @@ Model `gemini-3.5-flash`, policy mode `sections`, clock pinned to 31/10/2026 10:
 
 **Cliente:** Qual o endereço da loja? Vocês abrem hoje?
 
-**Tom:** A gente fica na Rua 14 de Maio, 3200, no Centro de Campo Grande/MS (CEP 79202-333).
+> 🔧 `get_store_policy({"section": "horario"})`
 
-Sim, estamos abertos hoje! Aos sábados nosso horário de funcionamento é das 09:00 às 13:00.
+**Tom:** Estamos na Rua 14 de Maio, 3200, Centro, Campo Grande/MS.
+
+Sim, estamos abertos hoje! Aos sábados funcionamos das 09:00 às 13:00, então pode passar aqui até às 13h.
 
 Posso te ajudar com mais alguma coisa?
 
-<sub>1.4 s</sub>
+<sub>2.0 s</sub>
 
 **Cliente:** Vocês vendem cordas e palhetas?
 
-**Tom:** Nós não vendemos acessórios como cordas e palhetas, trabalhamos exclusivamente com instrumentos musicais. 
+> 🔧 `get_store_policy({"section": "sobre_a_loja"})`
 
-Recomendo procurar uma loja especializada em acessórios musicais para encontrar o que precisa!
+**Tom:** Não vendemos acessórios como cordas e palhetas, trabalhamos exclusivamente com instrumentos musicais. 
 
-Se quiser ajuda para escolher algum instrumento musical, estou por aqui. Posso te ajudar com mais alguma coisa?
+Recomendo procurar uma loja especializada em acessórios musicais na cidade para encontrar o que precisa!
 
-<sub>1.5 s</sub>
+Se quiser ajuda para escolher algum instrumento, estou à disposição.
+
+<sub>1.9 s</sub>
 
 **Cliente:** Valeu! Ah, e quem ganhou a Copa de 2002?
 
-**Tom:** Só consigo te ajudar com dúvidas e informações sobre a Empório da Música e nossos instrumentos musicais. 
+**Tom:** Por nada! Mas só posso te ajudar com dúvidas e informações sobre a nossa loja e os nossos instrumentos. 
 
-Se precisar de ajuda com algum dos nossos instrumentos, é só me chamar! Posso te ajudar com mais alguma coisa?
+Se precisar de ajuda com algum instrumento musical, estou por aqui!
 
-<sub>1.3 s</sub>
+<sub>0.9 s</sub>
