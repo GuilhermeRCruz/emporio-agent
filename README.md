@@ -40,13 +40,13 @@ source .venv/bin/activate
 pip install -e ".[dev]"
 cp .env.example .env            # paste your key in GEMINI_API_KEY
 python -m emporio.ingest        # builds data/processed/emporio.db (< 1 s)
-emporio --trace                 # chat in the terminal, showing tool calls, latency and tokens
+emporio --trace                 # chat in the terminal (default: policies by section), with tool calls and latency
 ```
 
 More commands:
 
 ```bash
-emporio --mode rag_parent --trace  # same agent, policies looked up with RAG instead of by section
+emporio --mode rag_parent --trace  # same agent, but the policy manual is searched with RAG
 emporio --session ana           # saves the conversation; run it again to resume
 pytest                          # 15 deterministic tests of the data layer and tickets, no LLM
 python evals/run.py             # end-to-end eval on both policy modes (about 100 API calls)
