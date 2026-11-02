@@ -26,7 +26,7 @@ Tom:     Em 10x não é possível para o Yamaha C40 Nylon Natural.
 4. [Evaluation](#evaluation)
 5. [Assumptions about the data](#assumptions-about-the-data)
 6. [Known limitations and next steps](#known-limitations-and-next-steps)
-7. [Background: a RAG chatbot in production](#background-a-rag-chatbot-in-production)
+7. [Background: my previous RAG project](#background-my-previous-rag-project-not-part-of-this-challenge)
 8. [Use of AI coding assistants](#use-of-ai-coding-assistants)
 9. [Repository layout](#repository-layout)
 
@@ -113,9 +113,9 @@ The model chooses tools; Python answers them. Six narrow tools cover the store's
 ### 2. Three ways to read the policy manual, measured
 
 **RAG was not required by the challenge.** I had already built a RAG support chatbot at my
-previous job (see [Background](#background-a-rag-chatbot-in-production)), and that experience
+previous job, in a different project (see [Background](#background-my-previous-rag-project-not-part-of-this-challenge)), and that experience
 pointed to a simpler answer for an 8-page manual with clear sections: let the model pick the
-section. That is the default here. I still built RAG, the same way I did there, so the reviewers
+section. That is the default here. I still built RAG for this manual, so the reviewers
 can see how I approach it, and measured both on the same cases instead of choosing by opinion.
 
 **How the section lookup works:**
@@ -329,25 +329,24 @@ The challenge asks to document reasonable interpretations. These are the ones th
   measured) becomes the default, ideally hybrid with BM25 and a reranker, re-measured with the
   same evals.
 
-## Background: a RAG chatbot in production
+## Background: my previous RAG project (not part of this challenge)
+
+This section is about a different project, from my previous job. Nothing from it is in this
+repository; it is here only to explain why I chose the section lookup and why RAG appears in the
+code even though the challenge did not ask for it.
 
 At my previous job I built a RAG chatbot for the companies that used our ERP. We transcribed our
 video tutorials, embedded the transcripts and organised the chunks by tutorial category, so
-customers could ask the chatbot simple questions instead of calling support.
+customers could ask the chatbot simple questions instead of calling support. Two things I learned
+there:
 
-That project taught me where a customer service RAG goes wrong, and those lessons shaped this
-agent:
+* Questions unrelated to the product retrieve unrelated chunks, and the bot ends up answering
+  something wrong or nothing useful.
+* When the bot is not sure, the question should go to the support team instead of being guessed.
 
-* **Off-topic questions are the main source of bad answers.** They retrieve unrelated chunks and
-  the bot either answers something wrong or answers nothing useful. Here the scope rules decline
-  accessories and unrelated questions explicitly, and the evals test them.
-* **When in doubt, hand it to the support team.** Guessing costs more than escalating. Here the
-  agent says it will check with the team and opens a ticket (`register_ticket`), and it may only
-  claim a hand-off after the ticket exists.
-* **Retrieval should match how the content is organised.** There, chunks were grouped by tutorial
-  category; here, `rag_parent` matches small chunks and returns their whole section, the same
-  idea. For a small, well-structured manual the section lookup does this without embeddings,
-  which is why it is the default.
+Because of that experience, I knew that for a short manual with clear sections a RAG pipeline was
+not necessary, so I made the section lookup the default for this challenge. I built RAG only to
+show how I approach it and to compare both with numbers ([section 2](#2-three-ways-to-read-the-policy-manual-measured)).
 
 ## Use of AI coding assistants
 
@@ -362,8 +361,8 @@ in Portuguese. The workflow:
   give the best accuracy and speed; we settled on function calling over SQLite. Coming from my
   RAG project, I favoured a section lookup for the manual and asked for RAG to be built as well
   and measured against it, so the choice would rest on numbers. Discussing how chunks relate to
-  the manual's chapters, I proposed organising them by chapter, as I had done by tutorial
-  category before; that became `rag_parent`. After the comparison I chose which mode to remove.
+  the manual's chapters, I proposed organising them by chapter (in my previous
+  project they were grouped by tutorial category); that became `rag_parent`. After the comparison I chose which mode to remove.
   I switched the provider from OpenAI to Gemini midway (one commit shows the switch), and when
   the eval was about to make about 150 API calls I questioned it, which led to running RAG only
   on the policy cases.
